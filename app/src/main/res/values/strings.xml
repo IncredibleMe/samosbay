@@ -10,5 +10,16 @@
     <string name="action_play_next">Play Next</string>
     <string name="backdrop_title">LOVE MUSIC</string>
     <string name="backdrop_subtitle">This season top 20 albums</string>
+    <string name="title_activity_add_new_product">AddNewProduct</string>
 
+
+    <string name="category">Κατηγορία</string>
+    <string name="description">Περιγραφή</string>
+    <string name="product_name">Όνομα Προϊόντος</string>
+    <string name="price">Τιμή</string>
+    <string name="prosfora">Αποδοχή προσφορών</string>
+    <string name="eikona">Εικόνα</string>
+    <string name="tags">Tags</string>
+    <string name="kataxwrisi">Καταχώρηση</string>
+    <string name="selectImage">Επιλογή Εικόνας</string>
 </resources>
