@@ -6,8 +6,6 @@ import android.util.Log;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
-import com.j256.ormlite.stmt.PreparedQuery;
-import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
@@ -20,14 +18,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 
 public class DBConnector {
 
     private static ConnectionSource connectionSource;
     private static Dao<Product, Integer> productDao;
+    private static Dao<User, Integer> userDao;
     public static AsyncResponse delegate = null;
     private static Connection conn;
     private static String url = "jdbc:mysql://195.251.166.34/samosbay";
@@ -37,9 +33,11 @@ public class DBConnector {
 
         // create a connection source to our database
         connectionSource =
-                new JdbcConnectionSource(url, "root", "eleni123");
+                new JdbcConnectionSource(url, "root", "sanity");
         productDao =
                 DaoManager.createDao(connectionSource, Product.class);
+        userDao =
+                DaoManager.createDao(connectionSource, User.class);
         //dimiourgei ton pinaka ean den iparxei kata tin sundesi
         new createTable().execute();
     }
@@ -50,23 +48,17 @@ public class DBConnector {
     }
 
     public static void getProductList() {
-        FetchNews fetch = new FetchNews();
+        FetchProducts fetch = new FetchProducts();
         fetch.execute();
     }
 
     private static class createTable extends AsyncTask<Void, Void, Void> {
 
-        protected void onProgressUpdate(Integer... progress) {
-        }
-
-        protected void onPostExecute(Long result) {
-
-        }
-
         @Override
         protected Void doInBackground(Void... voids) {
             try {
                 TableUtils.createTableIfNotExists(connectionSource, Product.class);
+                TableUtils.createTableIfNotExists(connectionSource, User.class);
                 getProductList();
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -84,12 +76,6 @@ public class DBConnector {
             this.product = product;
         }
 
-        protected void onProgressUpdate(Integer... progress) {
-        }
-
-        protected void onPostExecute(Long result) {
-        }
-
         @Override
         protected Void doInBackground(Void... voids) {
 
@@ -104,7 +90,7 @@ public class DBConnector {
     }
 
 
-    private static class FetchNews extends AsyncTask<ConnectionSource, Void, ArrayList<Product>> {
+    private static class FetchProducts extends AsyncTask<ConnectionSource, Void, ArrayList<Product>> {
 
         @Override
         protected ArrayList<Product> doInBackground(ConnectionSource... connectionSources) {
@@ -122,7 +108,7 @@ public class DBConnector {
 //                e.printStackTrace();
 //            }
             try {
-                conn = DriverManager.getConnection(url, "root", "eleni123");
+                conn = DriverManager.getConnection(url, "root", "sanity");
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -139,6 +125,7 @@ public class DBConnector {
                     prod.setSeller(rs.getString("seller"));
                     prod.setCategory(rs.getString("category"));
                     prod.setPrice(rs.getFloat("price"));
+                    prod.setCreationDate(rs.getDate("creation_date"));
                     //Date cdate = rs.getString("creation_date");
                     //String seller = rs.getString("seller");
                     //Log.d("RESULT ", lastName);

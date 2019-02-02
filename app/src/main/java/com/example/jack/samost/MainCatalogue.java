@@ -4,7 +4,10 @@ import android.accounts.Account;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -24,19 +27,29 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.facebook.AccessToken;
+import com.facebook.Profile;
+import com.facebook.login.LoginManager;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
+import java.io.IOException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 //import com.j256.ormlite.dao.Dao;
 //import com.j256.ormlite.dao.DaoManager;
@@ -62,6 +75,27 @@ public class MainCatalogue extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //get the current user authToken
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
+
+        String userId = "";
+        if (isLoggedIn) {
+            userId = Profile.getCurrentProfile().getId();
+        } else {
+            //if the user is logged out then log him in
+            LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile"));
+        }
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        View hView = navigationView.getHeaderView(0);
+        CircleImageView imgvw = (CircleImageView) hView.findViewById(R.id.imageView);
+        TextView profileName = (TextView) hView.findViewById(R.id.userProfileName);
+        Uri profilePictureUri = Profile.getCurrentProfile().getProfilePictureUri(96, 96);
+        Glide.with(this).load(profilePictureUri)
+                .into(imgvw);
+        profileName.setText(Profile.getCurrentProfile().getFirstName() + Profile.getCurrentProfile().getMiddleName() + Profile.getCurrentProfile().getLastName());
+
         try {
             DBConnector.delegate = this;
             DBConnector.connectAndInsert();
@@ -81,7 +115,6 @@ public class MainCatalogue extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         //initCollapsingToolbar();
@@ -216,7 +249,6 @@ public class MainCatalogue extends AppCompatActivity
         Resources r = getResources();
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
     }
-
 
 
 }

@@ -15,6 +15,8 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 
@@ -24,15 +26,15 @@ public class ItemAdapter  extends RecyclerView.Adapter<ItemAdapter.MyViewHolder>
     private List<Product> itemlist;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView title, price, description;
+        public TextView title, price, cdate;
         public ImageView thumbnail, overflow;
 
         public MyViewHolder(View view) {
             super(view);
-            title = (TextView) view.findViewById(R.id.name);
-            price = (TextView) view.findViewById(R.id.price);
-            description = (TextView) view.findViewById(R.id.description);
-            thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
+            title =  view.findViewById(R.id.name);
+            price =  view.findViewById(R.id.price);
+            cdate =  view.findViewById(R.id.creation_date);
+            thumbnail =  view.findViewById(R.id.thumbnail);
         }
     }
 
@@ -54,8 +56,10 @@ public class ItemAdapter  extends RecyclerView.Adapter<ItemAdapter.MyViewHolder>
     public void onBindViewHolder(final MyViewHolder holder, int position) {
         Product product = itemlist.get(position);
         holder.title.setText(product.getName());
-        holder.price.setText(String.valueOf(product.getPrice()));
-        holder.description.setText(product.getDescription());
+        holder.price.setText("Τιμή :" + String.valueOf(product.getPrice()));
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        String creationDate = dateFormat.format(product.getCreationDate());
+        holder.cdate.setText(creationDate );
         Bitmap bitmap = BitmapFactory.decodeByteArray(product.getImage(), 0, product.getImage().length);
         holder.thumbnail.setImageBitmap(bitmap);
         // loading album cover using Glide library

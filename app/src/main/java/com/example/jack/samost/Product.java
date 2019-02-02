@@ -23,7 +23,8 @@ public class Product {
     private String seller;
     @DatabaseField
     private String category;
-    @DatabaseField(dataType = DataType.BYTE_ARRAY)
+    @DatabaseField(columnDefinition = "MEDIUMBLOB not null",
+            dataType = DataType.BYTE_ARRAY)
     byte[] image;
     @DatabaseField
     private Date creation_date;
