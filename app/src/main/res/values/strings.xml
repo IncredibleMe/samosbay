@@ -23,7 +23,8 @@
     <string name="kataxwrisi">Καταχώρηση</string>
     <string name="selectImage">Επιλογή Εικόνας</string>
 
-    <string name="facebook_app_id">385697392217381</string>
-    <string name="fb_login_protocol_scheme">fb385697392217381</string>
+    <string name="facebook_app_id">395709057830526</string>
+    <string name="fb_login_protocol_scheme">fb395709057830526</string>
+    <string name="title_activity_visit_product">VisitProduct</string>
 
 </resources>

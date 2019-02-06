@@ -23,6 +23,7 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.ProfileTracker;
+import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
@@ -43,6 +44,18 @@ public class MainActivity extends AppCompatActivity {
     private CallbackManager callbackManager;
     private static final String EMAIL = "email";
     private LoginButton loginButton;
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        AppEventsLogger.deactivateApp(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AppEventsLogger.activateApp(this);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,13 +100,14 @@ public class MainActivity extends AppCompatActivity {
                                 Toast.makeText(MainActivity.this, "Welcome " + Profile.getCurrentProfile().getFirstName(), Toast.LENGTH_LONG).show();
                                 mProfileTracker.stopTracking();
                                 Intent myIntent = new Intent(MainActivity.this, MainCatalogue.class);
+
                                 MainActivity.this.startActivity(myIntent);
                             }
                         };
                         } else {
                             Intent myIntent = new Intent(MainActivity.this, MainCatalogue.class);
                             MainActivity.this.startActivity(myIntent);
-                             }
+                         }
                     }
 
                     @Override
@@ -106,6 +120,14 @@ public class MainActivity extends AppCompatActivity {
                         // App code
                     }
                 });
+
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
+        if (isLoggedIn){
+            Intent myIntent = new Intent(MainActivity.this, MainCatalogue.class);
+            MainActivity.this.startActivity(myIntent);
+
+        }
     }
 
     private void getUserProfile(AccessToken currentAccessToken) {
@@ -135,8 +157,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        callbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
     private boolean checkAndRequestPermissions() {

@@ -16,20 +16,27 @@
             android:title="Add New Product" />
 
         <item
-            android:id="@+id/tools"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
+            android:id="@+id/watchist"
+            android:icon="@drawable/ic_folder_black_24dp"
+            android:title="WatchList" />
     </group>
 
     <item android:title="MSamosBay">
         <menu>
             <item
                 android:id="@+id/favorite"
-                android:icon="@drawable/ic_menu_share"
+                android:icon="@drawable/ic_satisfied"
                 android:title="Favorite" />
             <item
                 android:id="@+id/settings"
+                android:icon="@drawable/ic_menu_manage"
                 android:title="Settings" />
+
+            <item
+                android:id="@+id/logOut"
+                android:icon="@drawable/ic_clear_black_24dp"
+                android:title="Log Out" />
+
         </menu>
     </item>
 

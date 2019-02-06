@@ -86,6 +86,34 @@ public class AddNewProduct extends AppCompatActivity {
                 else{
                     product.setProsfora(0);
                 }
+
+                if(tv3.getText().toString().isEmpty())
+                {
+                    Toast.makeText(AddNewProduct.this, "Παρακαλώ συμπληρώστε κατηγορία προιόντος!", Toast.LENGTH_SHORT);
+                    return;
+                }
+                if(tv2.getText().toString().isEmpty())
+                {
+                    Toast.makeText(AddNewProduct.this, "Παρακαλώ συμπληρώστε περιγραφή προϊόντος!", Toast.LENGTH_SHORT);
+                    return;
+                }
+                if(tv1.getText().toString().isEmpty())
+                {
+                    Toast.makeText(AddNewProduct.this, "Παρακαλώ συμπληρώστε όνομα προϊόντος!", Toast.LENGTH_SHORT);
+                    return;
+                }
+                if(tv4.getText().toString().isEmpty())
+                {
+                    Toast.makeText(AddNewProduct.this, "Παρακαλώ συμπληρώστε τιμή προϊόντος!", Toast.LENGTH_SHORT);
+                    return;
+                }
+                if(tv5.getText().toString().isEmpty())
+                {
+                    Toast.makeText(AddNewProduct.this, "Παρακαλώ συμπληρώστε τα tags προϊόντος!", Toast.LENGTH_SHORT);
+                    return;
+                }
+
+
                 product.setCategory(tv3.getText().toString());
                 product.setDescription(tv2.getText().toString());
                 product.setName(tv1.getText().toString());
@@ -144,7 +172,14 @@ public class AddNewProduct extends AppCompatActivity {
             cursor.close();
 
             imageView = (ImageView) findViewById(R.id.imageView);
-            imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+            String extension = picturePath.substring(picturePath.lastIndexOf(".") + 1, picturePath.length());
+            if (extension.equals("jpg") || extension.equals("png") || extension.equals("jpeg")){
+                imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+            }
+            else {
+                Toast.makeText(this, "Το αρχείο πρέπει να είναι τύπου εικόνας!", Toast.LENGTH_LONG);
+            }
+
         }
     }
 

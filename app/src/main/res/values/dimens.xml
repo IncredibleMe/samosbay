@@ -20,5 +20,7 @@
     <dimen name="ic_album_overflow_margin_top">10dp</dimen>
     <dimen name="product_title">20dp</dimen>
     <dimen name="product_price">22dp</dimen>
+    <dimen name="view_product_price">30dp</dimen>
+    <dimen name="view_product_description">20dp</dimen>
     <dimen name="product_date">18dp</dimen>
 </resources>

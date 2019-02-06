@@ -1,6 +1,8 @@
 package com.example.jack.samost;
 
+import android.content.ClipData;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
@@ -20,21 +22,32 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 
-public class ItemAdapter  extends RecyclerView.Adapter<ItemAdapter.MyViewHolder> {
+public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.MyViewHolder> {
 
     private Context mContext;
     private List<Product> itemlist;
+    private Product product;
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
+
+    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView title, price, cdate;
         public ImageView thumbnail, overflow;
 
         public MyViewHolder(View view) {
             super(view);
-            title =  view.findViewById(R.id.name);
-            price =  view.findViewById(R.id.price);
-            cdate =  view.findViewById(R.id.creation_date);
-            thumbnail =  view.findViewById(R.id.thumbnail);
+            title = view.findViewById(R.id.name);
+            price = view.findViewById(R.id.price);
+            cdate = view.findViewById(R.id.creation_date);
+            thumbnail = view.findViewById(R.id.thumbnail);
+            view.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            Intent myIntent = new Intent(v.getContext(), ViewProduct.class);
+            myIntent.putExtra("viewproduct", product);
+            v.getContext().startActivity(myIntent);
+
         }
     }
 
@@ -54,16 +67,16 @@ public class ItemAdapter  extends RecyclerView.Adapter<ItemAdapter.MyViewHolder>
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position) {
-        Product product = itemlist.get(position);
+        product = itemlist.get(position);
         holder.title.setText(product.getName());
-        holder.price.setText("Τιμή :" + String.valueOf(product.getPrice()));
+        holder.price.setText("Τιμή :" + String.valueOf(product.getPrice()) + "€");
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         String creationDate = dateFormat.format(product.getCreationDate());
-        holder.cdate.setText(creationDate );
+        holder.cdate.setText(creationDate);
         Bitmap bitmap = BitmapFactory.decodeByteArray(product.getImage(), 0, product.getImage().length);
         holder.thumbnail.setImageBitmap(bitmap);
         // loading album cover using Glide library
-       // Glide.with(mContext).load(album.getThumbnail()).into(holder.thumbnail);
+        // Glide.with(mContext).load(album.getThumbnail()).into(holder.thumbnail);
 
 //        holder.overflow.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -84,8 +97,6 @@ public class ItemAdapter  extends RecyclerView.Adapter<ItemAdapter.MyViewHolder>
 //        popup.setOnMenuItemClickListener(new MyMenuItemClickListener());
 //        popup.show();
 //    }
-
-
     @Override
     public int getItemCount() {
         return itemlist.size();

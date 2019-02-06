@@ -2,6 +2,8 @@ package com.example.jack.samost;
 
 import android.accounts.Account;
 import android.app.ProgressDialog;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -15,8 +17,10 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.MenuInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -62,11 +66,14 @@ import de.hdodenhof.circleimageview.CircleImageView;
 //import java.sql.SQLException;
 
 public class MainCatalogue extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, AsyncResponse {
+        implements NavigationView.OnNavigationItemSelectedListener, AsyncResponse, SearchView.OnQueryTextListener {
 
     private RecyclerView recyclerView;
     private ItemAdapter adapter;
     private List<Product> itemList;
+    private NavigationView navigationView;
+    private boolean isLoggedIn;
+    private List<Product> filteredList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,24 +84,27 @@ public class MainCatalogue extends AppCompatActivity
 
         //get the current user authToken
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
+        isLoggedIn = accessToken != null && !accessToken.isExpired();
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
 
         String userId = "";
         if (isLoggedIn) {
             userId = Profile.getCurrentProfile().getId();
+
+            View hView = navigationView.getHeaderView(0);
+            CircleImageView imgvw = (CircleImageView) hView.findViewById(R.id.imageView);
+            TextView profileName = (TextView) hView.findViewById(R.id.userProfileName);
+
+            Uri profilePictureUri = Profile.getCurrentProfile().getProfilePictureUri(96, 96);
+            Glide.with(this).load(profilePictureUri)
+                    .into(imgvw);
+            profileName.setText(Profile.getCurrentProfile().getFirstName() + Profile.getCurrentProfile().getMiddleName() + Profile.getCurrentProfile().getLastName());
+
         } else {
             //if the user is logged out then log him in
             LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile"));
         }
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        View hView = navigationView.getHeaderView(0);
-        CircleImageView imgvw = (CircleImageView) hView.findViewById(R.id.imageView);
-        TextView profileName = (TextView) hView.findViewById(R.id.userProfileName);
-        Uri profilePictureUri = Profile.getCurrentProfile().getProfilePictureUri(96, 96);
-        Glide.with(this).load(profilePictureUri)
-                .into(imgvw);
-        profileName.setText(Profile.getCurrentProfile().getFirstName() + Profile.getCurrentProfile().getMiddleName() + Profile.getCurrentProfile().getLastName());
 
         try {
             DBConnector.delegate = this;
@@ -121,6 +131,7 @@ public class MainCatalogue extends AppCompatActivity
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
         itemList = new ArrayList<>();
+        filteredList = new ArrayList<>();
         adapter = new ItemAdapter(this, itemList);
 
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 1);
@@ -135,6 +146,8 @@ public class MainCatalogue extends AppCompatActivity
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
+
+
 
     }
 
@@ -151,8 +164,17 @@ public class MainCatalogue extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main_catalogue, menu);
+        MenuInflater inflater = getMenuInflater();
+        // Inflate menu to add items to action bar if it is present.
+        inflater.inflate(R.menu.menu_main, menu);
+        // Associate searchable configuration with the SearchView
+        SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView =
+                (SearchView) menu.findItem(R.id.menu_search).getActionView();
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName()));
+
         return true;
     }
 
@@ -178,17 +200,28 @@ public class MainCatalogue extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.myprofile) {
-            // Handle the camera action
+            Intent myIntent = new Intent(MainCatalogue.this, UserProfile.class);
+            MainCatalogue.this.startActivity(myIntent);
+
         } else if (id == R.id.settings) {
 
         } else if (id == R.id.favorite) {
 
-        } else if (id == R.id.tools) {
+        } else if (id == R.id.watchist) {
 
         } else if (id == R.id.newProduct) {
             Intent myIntent = new Intent(MainCatalogue.this, AddNewProduct.class);
             MainCatalogue.this.startActivity(myIntent);
+        } else if (id == R.id.logOut) {
+            if (isLoggedIn) {
+                //logout the user
+                LoginManager.getInstance().logOut();
+            }
+            Intent myIntent = new Intent(MainCatalogue.this, MainActivity.class);
+            MainCatalogue.this.startActivity(myIntent);
+
         }
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -207,6 +240,17 @@ public class MainCatalogue extends AppCompatActivity
         this.itemList.addAll(items);
         adapter.notifyDataSetChanged();
 
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+
+        return false;
     }
 
     public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
@@ -249,6 +293,7 @@ public class MainCatalogue extends AppCompatActivity
         Resources r = getResources();
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
     }
+
 
 
 }
